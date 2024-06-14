@@ -3,7 +3,8 @@
 import connectToDB from "@/database"
 import User from "@/models";
 import bcrypt from 'bcryptjs';
-
+import jwt from 'jsonwebtoken';
+import { cookies } from "next/headers";
 
 export async function registerUser(formData) {
     await connectToDB();
@@ -51,4 +52,55 @@ export async function registerUser(formData) {
             message: 'Something went wrong! Please try again'
         }
     }
+}
+
+export async function loginUserAction(formData) {
+
+    await connectToDB();
+
+    try {
+
+        const { email, password } = formData;
+
+        const checkUser = await User.findOne({ email });
+
+        if (!checkUser) {
+            return {
+                success: false,
+                message: 'User with this email not exists'
+            }
+        }
+
+        const checkPassword = await bcrypt.compare(password, checkUser.password);
+        if (!checkPassword) {
+            return {
+                success: false,
+                message: 'Incorrect password!'
+            }
+        }
+
+        const createdTokenData = {
+            id: checkUser._id,
+            username: checkUser.username,
+            email: checkUser.email
+        }
+
+        const token = jwt.sign(createdTokenData, "DEFAULT_KEY", { expiresIn: '1d' });
+
+        const getCookies = cookies();
+        getCookies.set('token', token);
+
+        return {
+            success: true,
+            message: 'Login successfully'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: 'Something went wrong! Please try again'
+        }
+    }
+
 }

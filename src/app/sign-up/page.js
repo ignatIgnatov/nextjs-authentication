@@ -33,7 +33,7 @@ const SignUp = () => {
             <form action={handleSignUp}>
                 {
                     userRegistrationFormControls.map((controlItem) => (
-                        <div className="flex flex-col gap-2">
+                        <div key={controlItem.name} className="flex flex-col gap-2">
                             <Label className="mt-3">{controlItem.label}</Label>
                             <CommonFormElement
                                 currentItem={controlItem}
@@ -45,7 +45,7 @@ const SignUp = () => {
                             />
                         </div>
                     ))}
-                <Button disabled={!handleSignUpBtnValid()} className="disabled:opacity-65" type='submit'>Sign Up</Button>
+                <Button disabled={!handleSignUpBtnValid()} className="disabled:opacity-65 mt-5" type='submit'>Sign Up</Button>
             </form>
         </div>
     )
